@@ -26,9 +26,12 @@ func (m model) scanCmd() tea.Cmd {
 			items []list.Item
 		)
 
-		iter := m.rdb.Scan(ctx, 0, m.searchValue, defaultScanCount).Iterator()
-		for iter.Next(ctx) {
-			key := iter.Val()
+		keys, _, err := m.rdb.Scan(ctx, 0, m.searchValue, defaultScanCount).Result()
+		if err != nil {
+			m.stateDesc = err.Error()
+			return nil
+		}
+		for _, key := range keys {
 			kt := m.rdb.Type(ctx, key).Val()
 			switch kt {
 			case "string":
@@ -52,10 +55,7 @@ func (m model) scanCmd() tea.Cmd {
 				items = append(items, item{keyType: kt, key: key, val: string(valBts)})
 			}
 		}
-		if err := iter.Err(); err != nil {
-			m.stateDesc = err.Error()
-			return nil
-		}
+
 		return scanMsg{items: items}
 	}
 }
