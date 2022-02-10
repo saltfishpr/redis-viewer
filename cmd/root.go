@@ -1,6 +1,7 @@
 package cmd
 
 import (
+	"context"
 	"log"
 	"os"
 
@@ -26,14 +27,25 @@ to quickly create a Cobra application.`,
 		config.LoadConfig()
 		cfg := config.GetConfig()
 
-		rdb := redis.NewClient(&redis.Options{
-			Addr:     cfg.Addr,
-			Password: cfg.Password,
-			DB:       cfg.DB,
-		})
+		var rdb *redis.Client
+		switch cfg.Mode {
+		case "sentinel":
+			rdb = redis.NewFailoverClient(&redis.FailoverOptions{
+				MasterName:    cfg.MasterName,
+				SentinelAddrs: cfg.SentinelAddrs,
+				Password:      cfg.SentinelPassword,
+			})
+		default:
+			rdb = redis.NewClient(&redis.Options{
+				Addr:     cfg.Addr,
+				Password: cfg.Password,
+				DB:       cfg.DB,
+			})
+		}
 
-		if rdb == nil {
-			log.Fatal("start failed: cannot connect to redis")
+		_, err := rdb.Ping(context.Background()).Result()
+		if err != nil {
+			log.Fatal("connect to redis failed: ", err)
 		}
 
 		p := tea.NewProgram(tui.New(rdb), tea.WithAltScreen())
