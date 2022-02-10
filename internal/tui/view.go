@@ -5,34 +5,23 @@
 package tui
 
 import (
-	"fmt"
-
 	"github.com/charmbracelet/lipgloss"
 )
 
+var (
+	appStyle = lipgloss.NewStyle().Padding(1, 2)
+)
+
 func (m *model) View() string {
-	s := "What should we buy at the market?\n\n"
+	var state string
+	var value string
 
-	for i, choice := range m.choices {
-		cursor := " "
-		if m.cursor == i {
-			cursor = ">"
-		}
+	list := m.list.View()
+	value = m.searchValue
 
-		checked := " "
-		if _, ok := m.selected[i]; ok {
-			checked = "x"
-		}
-
-		s += fmt.Sprintf("%s [%s] %s\n", cursor, checked, choice)
+	if m.state == searchState {
+		state = m.textinput.View()
 	}
 
-	s += "\nPress q to quit.\n"
-
-	input := m.textinput.View()
-
-	if m.state == insertState {
-		return lipgloss.JoinVertical(lipgloss.Left, s, input)
-	}
-	return lipgloss.JoinVertical(lipgloss.Left, s)
+	return appStyle.Render(lipgloss.JoinVertical(lipgloss.Left, lipgloss.JoinHorizontal(lipgloss.Top, list, value), state))
 }

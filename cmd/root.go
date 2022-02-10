@@ -24,7 +24,7 @@ to quickly create a Cobra application.`,
 	Run: func(cmd *cobra.Command, args []string) {
 		config.LoadConfig()
 
-		p := tea.NewProgram(tui.New(), tea.WithAltScreen(), tea.WithMouseAllMotion())
+		p := tea.NewProgram(tui.New(), tea.WithAltScreen())
 		if err := p.Start(); err != nil {
 			log.Fatal("start failed: ", err)
 		}
