@@ -12,9 +12,9 @@ import (
 )
 
 var (
-	appStyle = lipgloss.NewStyle().Padding(1, 2)
+	appStyle = lipgloss.NewStyle().Padding(0)
 
-	viewportStyle = lipgloss.NewStyle().Border(lipgloss.HiddenBorder(), false, false, false, true)
+	viewportStyle = lipgloss.NewStyle().Border(lipgloss.HiddenBorder(), false, true)
 )
 
 func (m *model) View() string {

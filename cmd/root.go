@@ -43,7 +43,7 @@ var rootCmd = &cobra.Command{
 			log.Fatal("connect to redis failed: ", err)
 		}
 
-		p := tea.NewProgram(tui.New(rdb), tea.WithAltScreen(), tea.WithMouseAllMotion())
+		p := tea.NewProgram(tui.New(rdb), tea.WithAltScreen(), tea.WithMouseCellMotion())
 		if err := p.Start(); err != nil {
 			log.Fatal("start failed: ", err)
 		}

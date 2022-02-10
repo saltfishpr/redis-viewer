@@ -29,6 +29,8 @@ type Config struct {
 
 	Password string `mapstructure:"password"`
 	DB       int    `mapstructure:"db"`
+
+	Count int `mapstructure:"count"`
 }
 
 // LoadConfig loads a users config and creates the config if it does not exist.
@@ -51,6 +53,9 @@ func LoadConfig() {
 
 	viper.SetConfigName("redis-viewer")
 	viper.SetConfigType("yml")
+
+	viper.SetDefault("mode", "client")
+	viper.SetDefault("count", 20)
 
 	if err := viper.SafeWriteConfig(); err != nil {
 		if os.IsNotExist(err) {

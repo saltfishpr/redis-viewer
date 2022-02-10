@@ -5,6 +5,8 @@
 package tui
 
 import (
+	"fmt"
+
 	"github.com/charmbracelet/bubbles/key"
 	"github.com/charmbracelet/bubbles/textinput"
 	"github.com/charmbracelet/bubbles/viewport"
@@ -58,12 +60,12 @@ func (m *model) handleKeys(msg tea.KeyMsg) tea.Cmd {
 		case tea.KeyEnter:
 			m.searchValue = m.textinput.Value()
 
-			cmd = m.scanCmd()
-			cmds = append(cmds, cmd)
-
 			m.textinput.Blur()
 			m.textinput.Reset()
 			m.state = defaultState
+
+			cmd = m.scanCmd()
+			cmds = append(cmds, cmd)
 		default:
 			m.textinput, cmd = m.textinput.Update(msg)
 			cmds = append(cmds, cmd)
@@ -80,19 +82,32 @@ func (m *model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	)
 
 	switch msg := msg.(type) {
+	case errMsg:
+		m.stateDesc = msg.err.Error()
 	case tea.WindowSizeMsg:
-		topGap, rightGap, bottomGap, leftGap := appStyle.GetPadding()
-		m.width = msg.Width - leftGap - rightGap
-		m.height = msg.Height - topGap - bottomGap
+		m.width = msg.Width
+		m.height = msg.Height
 
-		listWidth := int(listProportion * float64(m.width))
-		m.list.SetSize(listWidth, m.height-statusBarHeight)
+		topGap, rightGap, bottomGap, leftGap := appStyle.GetPadding()
+		w := msg.Width - leftGap - rightGap
+		h := msg.Height - topGap - bottomGap
+
+		listWidth := int(listProportion * float64(w))
+		m.list.SetSize(listWidth, h-statusBarHeight)
 
 		viewportWidth := m.width - listWidth
-		viewportBorderLeft := viewportStyle.GetBorderLeftSize()
-		m.viewport = viewport.New(viewportWidth-viewportBorderLeft, m.height-statusBarHeight)
+		viewportHorizontalBorderSize := viewportStyle.GetHorizontalBorderSize()
+		m.viewport = viewport.New(viewportWidth-viewportHorizontalBorderSize, h-statusBarHeight)
+
+		m.list, cmd = m.list.Update(msg)
+		cmds = append(cmds, cmd)
+		m.textinput, cmd = m.textinput.Update(msg)
+		cmds = append(cmds, cmd)
+		m.viewport, cmd = m.viewport.Update(msg)
+		cmds = append(cmds, cmd)
 	case scanMsg:
 		m.list.SetItems(msg.items)
+		m.stateDesc = fmt.Sprintf("%d keys found", msg.count)
 	case tea.MouseMsg:
 		m.handleMouse(msg)
 	case tea.KeyMsg:

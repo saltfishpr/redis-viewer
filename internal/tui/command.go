@@ -13,8 +13,13 @@ import (
 	tea "github.com/charmbracelet/bubbletea"
 )
 
+type errMsg struct {
+	err error
+}
+
 type scanMsg struct {
 	items []list.Item
+	count int
 }
 
 func (m model) scanCmd() tea.Cmd {
@@ -28,8 +33,7 @@ func (m model) scanCmd() tea.Cmd {
 
 		keys, _, err := m.rdb.Scan(ctx, 0, m.searchValue, defaultScanCount).Result()
 		if err != nil {
-			m.stateDesc = err.Error()
-			return nil
+			return errMsg{err: err}
 		}
 		for _, key := range keys {
 			kt := m.rdb.Type(ctx, key).Val()
@@ -51,11 +55,20 @@ func (m model) scanCmd() tea.Cmd {
 			if err != nil {
 				items = append(items, item{keyType: kt, key: key, val: err.Error(), err: true})
 			} else {
-				valBts, _ := util.JsonMarshal(val)
+				valBts, _ := util.JsonMarshalIndent(val)
 				items = append(items, item{keyType: kt, key: key, val: string(valBts)})
 			}
 		}
 
-		return scanMsg{items: items}
+		var count int
+		iter := m.rdb.Scan(ctx, 0, m.searchValue, 0).Iterator()
+		for iter.Next(ctx) {
+			count++
+		}
+		if err := iter.Err(); err != nil {
+			return errMsg{err: err}
+		}
+
+		return scanMsg{items: items, count: count}
 	}
 }
