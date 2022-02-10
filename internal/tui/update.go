@@ -34,6 +34,9 @@ func (m *model) handleKeys(msg tea.KeyMsg) tea.Cmd {
 				m.state = searchState
 				m.textinput.Focus()
 				return textinput.Blink
+			case key.Matches(msg, m.keyMap.scan):
+				cmd = m.scanCmd()
+				cmds = append(cmds, cmd)
 			}
 		case tea.KeyCtrlC:
 			cmd = tea.Quit
@@ -53,9 +56,14 @@ func (m *model) handleKeys(msg tea.KeyMsg) tea.Cmd {
 			m.state = defaultState
 		case tea.KeyEnter:
 			m.searchValue = m.textinput.Value()
+
+			cmd = m.scanCmd()
+			cmds = append(cmds, cmd)
+
 			m.textinput.Blur()
 			m.textinput.Reset()
 			m.state = defaultState
+			m.stateDesc = ""
 		default:
 			m.textinput, cmd = m.textinput.Update(msg)
 			cmds = append(cmds, cmd)
@@ -75,6 +83,8 @@ func (m *model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	case tea.WindowSizeMsg:
 		topGap, rightGap, bottomGap, leftGap := appStyle.GetPadding()
 		m.list.SetSize(msg.Width-leftGap-rightGap, msg.Height-topGap-bottomGap-1)
+	case scanMsg:
+		m.list.SetItems(msg.items)
 	case tea.MouseMsg:
 		m.handleMouse(msg)
 	case tea.KeyMsg:

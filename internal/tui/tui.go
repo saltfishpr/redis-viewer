@@ -9,52 +9,40 @@ import (
 	"github.com/charmbracelet/bubbles/list"
 	"github.com/charmbracelet/bubbles/textinput"
 	"github.com/charmbracelet/lipgloss"
-)
-
-type state int
-
-const (
-	defaultState state = iota
-	searchState
+	"github.com/go-redis/redis/v8"
 )
 
 type model struct {
 	list      list.Model
 	textinput textinput.Model
 
+	rdb         *redis.Client
 	searchValue string
+	valueDetail string
+	stateDesc   string
 
 	keyMap
-
 	state
 }
 
-func New() *model {
+func New(rdb *redis.Client) *model {
 	t := textinput.New()
 	t.Prompt = "> "
-	t.CharLimit = 256
-	t.Placeholder = "Enter new item"
+	t.Placeholder = "Search Key"
 	t.PlaceholderStyle = lipgloss.NewStyle()
 
-	items := []list.Item{
-		item{title: "Apple", description: "🍎"},
-		item{title: "Banana", description: "🍌"},
-		item{title: "Cherry", description: "🍒"},
-		item{title: "Date", description: "🍅"},
-	}
-
-	l := list.New(items, list.NewDefaultDelegate(), 0, 0)
-	l.Title = "Which fruit do you want?"
+	l := list.New(nil, list.NewDefaultDelegate(), 0, 0)
+	l.Title = "Redis Viewer by SaltFishPr"
+	l.SetFilteringEnabled(false)
 	l.SetShowHelp(false)
 
 	return &model{
 		list:      l,
 		textinput: t,
 
-		searchValue: "[Value]",
+		rdb: rdb,
 
 		keyMap: defaultKeyMap(),
-
-		state: defaultState,
+		state:  defaultState,
 	}
 }

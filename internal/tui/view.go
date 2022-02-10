@@ -13,15 +13,19 @@ var (
 )
 
 func (m *model) View() string {
-	var state string
-	var value string
-
-	list := m.list.View()
-	value = m.searchValue
-
-	if m.state == searchState {
-		state = m.textinput.View()
+	if it := m.list.SelectedItem(); it != nil {
+		m.valueDetail = "Value:\n" + it.(item).val
 	}
 
-	return appStyle.Render(lipgloss.JoinVertical(lipgloss.Left, lipgloss.JoinHorizontal(lipgloss.Top, list, value), state))
+	if m.state == searchState {
+		m.stateDesc = m.textinput.View()
+	}
+
+	return appStyle.Render(
+		lipgloss.JoinVertical(
+			lipgloss.Left,
+			lipgloss.JoinHorizontal(lipgloss.Top, m.list.View(), m.valueDetail),
+			m.stateDesc,
+		),
+	)
 }

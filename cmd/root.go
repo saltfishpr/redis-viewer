@@ -8,6 +8,7 @@ import (
 	"redis-viewer/internal/tui"
 
 	tea "github.com/charmbracelet/bubbletea"
+	"github.com/go-redis/redis/v8"
 	"github.com/spf13/cobra"
 )
 
@@ -23,8 +24,19 @@ This application is a tool to generate the needed files
 to quickly create a Cobra application.`,
 	Run: func(cmd *cobra.Command, args []string) {
 		config.LoadConfig()
+		cfg := config.GetConfig()
 
-		p := tea.NewProgram(tui.New(), tea.WithAltScreen())
+		rdb := redis.NewClient(&redis.Options{
+			Addr:     cfg.Addr,
+			Password: cfg.Password,
+			DB:       cfg.DB,
+		})
+
+		if rdb == nil {
+			log.Fatal("start failed: cannot connect to redis")
+		}
+
+		p := tea.NewProgram(tui.New(rdb), tea.WithAltScreen())
 		if err := p.Start(); err != nil {
 			log.Fatal("start failed: ", err)
 		}

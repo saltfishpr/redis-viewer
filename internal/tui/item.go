@@ -4,11 +4,20 @@
 
 package tui
 
+import "strconv"
+
 type item struct {
-	title       string
-	description string
+	key string
+	val string
+
+	err bool
 }
 
-func (i item) Title() string       { return i.title }
-func (i item) Description() string { return i.description }
-func (i item) FilterValue() string { return i.title }
+func (i item) Title() string { return i.key }
+func (i item) Description() string {
+	if i.err {
+		return "get error: " + i.val
+	}
+	return "keySize: " + strconv.Itoa(len(i.key)) + ", valueSize: " + strconv.Itoa(len(i.val))
+}
+func (i item) FilterValue() string { return i.key }

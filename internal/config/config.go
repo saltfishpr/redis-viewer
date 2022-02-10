@@ -18,7 +18,9 @@ import (
 
 // Config represents the main config for the application.
 type Config struct {
-	Name string `mapstructure:"name"`
+	Addr     string `mapstructure:"addr"`
+	Password string `mapstructure:"password"`
+	DB       int    `mapstructure:"db"`
 }
 
 // LoadConfig loads a users config and creates the config if it does not exist.
