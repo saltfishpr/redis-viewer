@@ -8,17 +8,20 @@ package tui
 import (
 	"github.com/charmbracelet/bubbles/list"
 	"github.com/charmbracelet/bubbles/textinput"
+	"github.com/charmbracelet/bubbles/viewport"
 	"github.com/charmbracelet/lipgloss"
 	"github.com/go-redis/redis/v8"
 )
 
 type model struct {
+	width, height int
+
 	list      list.Model
 	textinput textinput.Model
+	viewport  viewport.Model
 
 	rdb         *redis.Client
 	searchValue string
-	valueDetail string
 	stateDesc   string
 
 	keyMap

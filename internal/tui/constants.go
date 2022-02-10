@@ -14,3 +14,8 @@ const (
 const (
 	defaultScanCount = 500
 )
+
+const (
+	listProportion  = 0.3
+	statusBarHeight = 1
+)

@@ -7,6 +7,7 @@ package tui
 import (
 	"github.com/charmbracelet/bubbles/key"
 	"github.com/charmbracelet/bubbles/textinput"
+	"github.com/charmbracelet/bubbles/viewport"
 	tea "github.com/charmbracelet/bubbletea"
 )
 
@@ -14,9 +15,9 @@ import (
 func (m *model) handleMouse(msg tea.MouseMsg) {
 	switch msg.Type {
 	case tea.MouseWheelUp:
-		m.list.CursorUp()
+		m.viewport.ViewUp()
 	case tea.MouseWheelDown:
-		m.list.CursorDown()
+		m.viewport.ViewDown()
 	}
 }
 
@@ -63,7 +64,6 @@ func (m *model) handleKeys(msg tea.KeyMsg) tea.Cmd {
 			m.textinput.Blur()
 			m.textinput.Reset()
 			m.state = defaultState
-			m.stateDesc = ""
 		default:
 			m.textinput, cmd = m.textinput.Update(msg)
 			cmds = append(cmds, cmd)
@@ -82,7 +82,15 @@ func (m *model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	switch msg := msg.(type) {
 	case tea.WindowSizeMsg:
 		topGap, rightGap, bottomGap, leftGap := appStyle.GetPadding()
-		m.list.SetSize(msg.Width-leftGap-rightGap, msg.Height-topGap-bottomGap-1)
+		m.width = msg.Width - leftGap - rightGap
+		m.height = msg.Height - topGap - bottomGap
+
+		listWidth := int(listProportion * float64(m.width))
+		m.list.SetSize(listWidth, m.height-statusBarHeight)
+
+		viewportWidth := m.width - listWidth
+		viewportBorderLeft := viewportStyle.GetBorderLeftSize()
+		m.viewport = viewport.New(viewportWidth-viewportBorderLeft, m.height-statusBarHeight)
 	case scanMsg:
 		m.list.SetItems(msg.items)
 	case tea.MouseMsg:
@@ -95,6 +103,9 @@ func (m *model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		cmds = append(cmds, cmd)
 
 		m.textinput, cmd = m.textinput.Update(msg)
+		cmds = append(cmds, cmd)
+
+		m.viewport, cmd = m.viewport.Update(msg)
 		cmds = append(cmds, cmd)
 	}
 
