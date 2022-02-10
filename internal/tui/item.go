@@ -7,6 +7,8 @@ package tui
 import "strconv"
 
 type item struct {
+	keyType string
+
 	key string
 	val string
 

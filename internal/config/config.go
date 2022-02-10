@@ -21,14 +21,14 @@ type Config struct {
 	Mode string `mapstructure:"mode"`
 
 	// client
-	Addr     string `mapstructure:"addr"`
-	Password string `mapstructure:"password"`
-	DB       int    `mapstructure:"db"`
+	Addr string `mapstructure:"addr"`
 
 	// sentinel
-	MasterName       string   `mapstructure:"master_name"`
-	SentinelAddrs    []string `mapstructure:"sentinel_addrs"`
-	SentinelPassword string   `mapstructure:"sentinel_password"`
+	MasterName    string   `mapstructure:"master_name"`
+	SentinelAddrs []string `mapstructure:"sentinel_addrs"`
+
+	Password string `mapstructure:"password"`
+	DB       int    `mapstructure:"db"`
 }
 
 // LoadConfig loads a users config and creates the config if it does not exist.

@@ -5,6 +5,8 @@
 package tui
 
 import (
+	"fmt"
+
 	"github.com/charmbracelet/lipgloss"
 )
 
@@ -14,7 +16,7 @@ var (
 
 func (m *model) View() string {
 	if it := m.list.SelectedItem(); it != nil {
-		m.valueDetail = "Value:\n" + it.(item).val
+		m.valueDetail = fmt.Sprintf("KeyType: %s\nValue:\n%s", it.(item).keyType, it.(item).val)
 	}
 
 	if m.state == searchState {

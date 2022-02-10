@@ -16,13 +16,8 @@ import (
 // rootCmd represents the base command when called without any subcommands
 var rootCmd = &cobra.Command{
 	Use:   "redis-viewer",
-	Short: "A brief description of your application",
-	Long: `A longer description that spans multiple lines and likely contains
-examples and usage of using your application. For example:
-
-Cobra is a CLI library for Go that empowers applications.
-This application is a tool to generate the needed files
-to quickly create a Cobra application.`,
+	Short: "view redis data in terminal.",
+	Long:  `Redis Viewer is a tool to view redis data in terminal.`,
 	Run: func(cmd *cobra.Command, args []string) {
 		config.LoadConfig()
 		cfg := config.GetConfig()
@@ -33,7 +28,7 @@ to quickly create a Cobra application.`,
 			rdb = redis.NewFailoverClient(&redis.FailoverOptions{
 				MasterName:    cfg.MasterName,
 				SentinelAddrs: cfg.SentinelAddrs,
-				Password:      cfg.SentinelPassword,
+				Password:      cfg.Password,
 			})
 		default:
 			rdb = redis.NewClient(&redis.Options{
