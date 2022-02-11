@@ -11,6 +11,7 @@ import (
 	"github.com/charmbracelet/bubbles/textinput"
 	"github.com/charmbracelet/bubbles/viewport"
 	tea "github.com/charmbracelet/bubbletea"
+	"github.com/charmbracelet/lipgloss"
 )
 
 // handleMouse handles all mouse interaction.
@@ -75,7 +76,7 @@ func (m *model) handleKeys(msg tea.KeyMsg) tea.Cmd {
 	return tea.Batch(cmds...)
 }
 
-func (m *model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
+func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	var (
 		cmd  tea.Cmd
 		cmds []tea.Cmd
@@ -83,34 +84,26 @@ func (m *model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 
 	switch msg := msg.(type) {
 	case errMsg:
-		m.stateDesc = msg.err.Error()
+		m.statusMessage = msg.err.Error()
 	case tea.WindowSizeMsg:
-		m.width = msg.Width
-		m.height = msg.Height
+		m.width, m.height = msg.Width, msg.Height
+		statusBarHeight := lipgloss.Height(m.statusView())
+		height := m.height - statusBarHeight
 
-		topGap, rightGap, bottomGap, leftGap := appStyle.GetPadding()
-		w := msg.Width - leftGap - rightGap
-		h := msg.Height - topGap - bottomGap
+		listViewWidth := int(listProportion * float64(m.width))
+		listViewStyle.Width(listViewWidth)
+		listViewStyle.Height(height)
+		listWidth := listViewWidth - listViewStyle.GetHorizontalFrameSize()
+		m.list.SetSize(listWidth, height)
 
-		listWidth := int(listProportion * float64(w))
-		m.list.SetSize(listWidth, h-statusBarHeight)
-
-		viewportWidth := m.width - listWidth
-		viewportHorizontalBorderSize := viewportStyle.GetHorizontalBorderSize()
-		m.viewport = viewport.New(viewportWidth-viewportHorizontalBorderSize, h-statusBarHeight)
-
-		m.list, cmd = m.list.Update(msg)
-		cmds = append(cmds, cmd)
-		m.textinput, cmd = m.textinput.Update(msg)
-		cmds = append(cmds, cmd)
-		m.viewport, cmd = m.viewport.Update(msg)
-		cmds = append(cmds, cmd)
+		detailViewWidth := m.width - listViewWidth
+		m.viewport = viewport.New(detailViewWidth, height)
 	case scanMsg:
 		m.list.SetItems(msg.items)
 		if msg.count > maxScanCount {
-			m.stateDesc = fmt.Sprintf("%d+ keys found", maxScanCount)
+			m.statusMessage = fmt.Sprintf("%d+ keys found", maxScanCount)
 		} else {
-			m.stateDesc = fmt.Sprintf("%d keys found", msg.count)
+			m.statusMessage = fmt.Sprintf("%d keys found", msg.count)
 		}
 	case tea.MouseMsg:
 		m.handleMouse(msg)

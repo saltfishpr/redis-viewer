@@ -7,6 +7,7 @@ package tui
 import (
 	"context"
 	"fmt"
+
 	"redis-viewer/internal/config"
 	"redis-viewer/internal/util"
 

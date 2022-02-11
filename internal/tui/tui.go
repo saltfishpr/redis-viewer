@@ -20,9 +20,9 @@ type model struct {
 	textinput textinput.Model
 	viewport  viewport.Model
 
-	rdb         *redis.Client
-	searchValue string
-	stateDesc   string
+	rdb           *redis.Client
+	searchValue   string
+	statusMessage string
 
 	keyMap
 	state
@@ -36,8 +36,9 @@ func New(rdb *redis.Client) *model {
 
 	l := list.New(nil, list.NewDefaultDelegate(), 0, 0)
 	l.Title = "Redis Viewer by SaltFishPr"
-	l.SetFilteringEnabled(false)
+	l.SetShowFilter(false)
 	l.SetShowHelp(false)
+	l.SetFilteringEnabled(false)
 
 	return &model{
 		list:      l,

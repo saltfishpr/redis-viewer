@@ -25,17 +25,21 @@ var rootCmd = &cobra.Command{
 		var rdb *redis.Client
 		switch cfg.Mode {
 		case "sentinel":
-			rdb = redis.NewFailoverClient(&redis.FailoverOptions{
-				MasterName:    cfg.MasterName,
-				SentinelAddrs: cfg.SentinelAddrs,
-				Password:      cfg.Password,
-			})
+			rdb = redis.NewFailoverClient(
+				&redis.FailoverOptions{
+					MasterName:    cfg.MasterName,
+					SentinelAddrs: cfg.SentinelAddrs,
+					Password:      cfg.Password,
+				},
+			)
 		default:
-			rdb = redis.NewClient(&redis.Options{
-				Addr:     cfg.Addr,
-				Password: cfg.Password,
-				DB:       cfg.DB,
-			})
+			rdb = redis.NewClient(
+				&redis.Options{
+					Addr:     cfg.Addr,
+					Password: cfg.Password,
+					DB:       cfg.DB,
+				},
+			)
 		}
 
 		_, err := rdb.Ping(context.Background()).Result()
