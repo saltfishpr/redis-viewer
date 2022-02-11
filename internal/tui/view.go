@@ -14,7 +14,8 @@ import (
 
 var (
 	listViewStyle = lipgloss.NewStyle().
-			MarginRight(2).
+			PaddingRight(1).
+			MarginRight(1).
 			Border(lipgloss.RoundedBorder(), false, true, false, false)
 	dividerStyle = lipgloss.NewStyle().
 			Foreground(lipgloss.AdaptiveColor{Light: "#9B9B9B", Dark: "#5C5C5C"})
@@ -42,19 +43,18 @@ func (m model) detailView() string {
 	builder := &strings.Builder{}
 	divider := dividerStyle.Render(strings.Repeat("-", m.viewport.Width)) + "\n"
 	if it := m.list.SelectedItem(); it != nil {
-		key := fmt.Sprintf("Key: \n%s\n", it.(item).key)
 		keyType := fmt.Sprintf("KeyType: %s\n", it.(item).keyType)
+		key := fmt.Sprintf("Key: \n%s\n", it.(item).key)
 		value := fmt.Sprintf("Value: \n%s\n", it.(item).val)
-		builder.WriteString(key)
-		builder.WriteString(divider)
 		builder.WriteString(keyType)
+		builder.WriteString(divider)
+		builder.WriteString(key)
 		builder.WriteString(divider)
 		builder.WriteString(value)
 	} else {
 		builder.WriteString("No item selected")
 	}
-	m.viewport.SetContent(wordwrap.String(builder.String(), m.viewport.Width))
-	return m.viewport.View()
+	return wordwrap.String(builder.String(), m.viewport.Width)
 }
 
 func (m model) statusView() string {
@@ -83,9 +83,10 @@ func (m model) statusView() string {
 }
 
 func (m model) View() string {
+	m.viewport.SetContent(m.detailView())
 	return lipgloss.JoinVertical(
 		lipgloss.Left,
-		lipgloss.JoinHorizontal(lipgloss.Top, m.listView(), m.detailView()),
+		lipgloss.JoinHorizontal(lipgloss.Top, m.listView(), m.viewport.View()),
 		m.statusView(),
 	)
 }

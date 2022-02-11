@@ -12,7 +12,7 @@ const (
 )
 
 const (
-	maxScanCount = 9999
-
-	listProportion = 0.3
+	maxScanCount     = 9999
+	mouseScrollSpeed = 3
+	listProportion   = 0.3
 )

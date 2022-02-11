@@ -17,9 +17,11 @@ import (
 func (m *model) handleMouse(msg tea.MouseMsg) {
 	switch msg.Type {
 	case tea.MouseWheelUp:
-		m.viewport.ViewUp()
+		m.viewport.LineUp(mouseScrollSpeed)
+		m.viewport.SetContent(m.detailView())
 	case tea.MouseWheelDown:
-		m.viewport.ViewDown()
+		m.viewport.LineDown(mouseScrollSpeed)
+		m.viewport.SetContent(m.detailView())
 	}
 }
 
@@ -90,13 +92,12 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		height := m.height - statusBarHeight
 
 		listViewWidth := int(listProportion * float64(m.width))
-		listViewStyle.Width(listViewWidth)
-		listViewStyle.Height(height)
 		listWidth := listViewWidth - listViewStyle.GetHorizontalFrameSize()
 		m.list.SetSize(listWidth, height)
 
 		detailViewWidth := m.width - listViewWidth
 		m.viewport = viewport.New(detailViewWidth, height)
+		m.viewport.SetContent(m.detailView())
 	case scanMsg:
 		m.list.SetItems(msg.items)
 		if msg.count > maxScanCount {
