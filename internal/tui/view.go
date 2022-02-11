@@ -20,16 +20,18 @@ var (
 
 func (m *model) View() string {
 	builder := &strings.Builder{}
-	divider := dividerStyle.Render(strings.Repeat("-", m.viewport.Width)) + "\n"
+	divider := dividerStyle.Render(strings.Repeat("-", m.viewport.Width))
 	if it := m.list.SelectedItem(); it != nil {
 		key := fmt.Sprintf("Key: \n%s\n", it.(item).key)
 		keyType := fmt.Sprintf("KeyType: %s\n", it.(item).keyType)
 		value := fmt.Sprintf("Value: \n%s\n", it.(item).val)
-		builder.WriteString(wordwrap.String(key, m.viewport.Width))
+		builder.WriteString(key)
 		builder.WriteString(divider)
-		builder.WriteString(wordwrap.String(keyType, m.viewport.Width))
+		builder.WriteByte('\n')
+		builder.WriteString(keyType)
 		builder.WriteString(divider)
-		builder.WriteString(wordwrap.String(value, m.viewport.Width))
+		builder.WriteByte('\n')
+		builder.WriteString(value)
 	} else {
 		builder.WriteString("No item selected")
 	}
