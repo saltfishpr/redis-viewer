@@ -1,4 +1,4 @@
-// @description:
+// @description: 定义常量
 // @file: constants.go
 // @date: 2022/02/10
 

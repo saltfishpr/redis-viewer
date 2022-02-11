@@ -46,6 +46,10 @@ db: 0
 -   client and sentinel connection.
 -   `string, hash, list, set, zset` key types.
 
+## Note:
+
+In Windows, you should change system encoding to `UTF-8` before run this program.
+
 ## TODOs:
 
 -   [ ] Add load animation.

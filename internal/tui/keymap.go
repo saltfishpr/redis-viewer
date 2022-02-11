@@ -1,4 +1,4 @@
-// @description: 快捷键映射
+// @description: 键盘映射
 // @file: keymap.go
 // @date: 2022/02/07
 

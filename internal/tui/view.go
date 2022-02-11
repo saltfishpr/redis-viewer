@@ -1,4 +1,3 @@
-// @description:
 // @file: view.go
 // @date: 2022/02/08
 
@@ -14,15 +13,25 @@ import (
 )
 
 var (
-	listViewStyle = lipgloss.NewStyle().MarginRight(2).Border(lipgloss.RoundedBorder(), false, true, false, false)
-	dividerStyle  = lipgloss.NewStyle().Foreground(lipgloss.AdaptiveColor{Light: "#9B9B9B", Dark: "#5C5C5C"})
+	listViewStyle = lipgloss.NewStyle().
+			MarginRight(2).
+			Border(lipgloss.RoundedBorder(), false, true, false, false)
+	dividerStyle = lipgloss.NewStyle().
+			Foreground(lipgloss.AdaptiveColor{Light: "#9B9B9B", Dark: "#5C5C5C"})
 
 	statusNugget   = lipgloss.NewStyle().Foreground(lipgloss.Color("#FFFDF5")).Padding(0, 1)
-	statusBarStyle = lipgloss.NewStyle().Foreground(lipgloss.AdaptiveColor{Light: "#343433", Dark: "#C1C6B2"}).Background(lipgloss.AdaptiveColor{Light: "#D9DCCF", Dark: "#353533"})
-	statusStyle    = lipgloss.NewStyle().Inherit(statusBarStyle).Foreground(lipgloss.Color("#FFFDF5")).Background(lipgloss.Color("#FF5F87")).Padding(0, 1).MarginRight(1)
-	encodingStyle  = statusNugget.Copy().Background(lipgloss.Color("#A550DF")).Align(lipgloss.Right)
-	statusText     = lipgloss.NewStyle().Inherit(statusBarStyle)
-	datetimeStyle  = statusNugget.Copy().Background(lipgloss.Color("#6124DF"))
+	statusBarStyle = lipgloss.NewStyle().
+			Foreground(lipgloss.AdaptiveColor{Light: "#343433", Dark: "#C1C6B2"}).
+			Background(lipgloss.AdaptiveColor{Light: "#D9DCCF", Dark: "#353533"})
+	statusStyle = lipgloss.NewStyle().
+			Inherit(statusBarStyle).
+			Foreground(lipgloss.Color("#FFFDF5")).
+			Background(lipgloss.Color("#FF5F87")).
+			Padding(0, 1).
+			MarginRight(1)
+	encodingStyle = statusNugget.Copy().Background(lipgloss.Color("#A550DF")).Align(lipgloss.Right)
+	statusText    = lipgloss.NewStyle().Inherit(statusBarStyle)
+	datetimeStyle = statusNugget.Copy().Background(lipgloss.Color("#6124DF"))
 )
 
 func (m model) listView() string {
@@ -68,13 +77,7 @@ func (m model) statusView() string {
 		Width(m.width - lipgloss.Width(statusKey) - lipgloss.Width(encoding) - lipgloss.Width(datetime)).
 		Render(statusDesc)
 
-	bar := lipgloss.JoinHorizontal(
-		lipgloss.Top,
-		statusKey,
-		statusVal,
-		encoding,
-		datetime,
-	)
+	bar := lipgloss.JoinHorizontal(lipgloss.Top, statusKey, statusVal, encoding, datetime)
 
 	return statusBarStyle.Width(m.width).Render(bar)
 }

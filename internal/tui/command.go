@@ -1,4 +1,4 @@
-// @description:
+// @description: commands
 // @file: command.go
 // @date: 2022/02/07
 

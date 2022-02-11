@@ -1,4 +1,3 @@
-// @description:
 // @file: update.go
 // @date: 2022/02/08
 

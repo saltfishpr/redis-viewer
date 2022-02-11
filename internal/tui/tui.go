@@ -1,4 +1,3 @@
-// @description:
 // @file: tui.go
 // @date: 2022/02/07
 
