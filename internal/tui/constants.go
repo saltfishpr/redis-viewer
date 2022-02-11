@@ -14,4 +14,5 @@ const (
 const (
 	listProportion  = 0.3
 	statusBarHeight = 1
+	maxScanCount    = 9999
 )

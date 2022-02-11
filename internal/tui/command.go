@@ -66,6 +66,9 @@ func (m model) scanCmd() tea.Cmd {
 		iter := m.rdb.Scan(ctx, 0, m.searchValue, 0).Iterator()
 		for iter.Next(ctx) {
 			count++
+			if count > maxScanCount {
+				break
+			}
 		}
 		if err := iter.Err(); err != nil {
 			return errMsg{err: err}

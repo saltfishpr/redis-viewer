@@ -6,22 +6,35 @@ package tui
 
 import (
 	"fmt"
+	"strings"
 
 	"github.com/charmbracelet/lipgloss"
 	"github.com/muesli/reflow/wordwrap"
 )
 
 var (
-	appStyle = lipgloss.NewStyle().Padding(0)
-
+	appStyle      = lipgloss.NewStyle().Padding(0)
+	dividerStyle  = lipgloss.NewStyle().Foreground(lipgloss.AdaptiveColor{Light: "#9B9B9B", Dark: "#5C5C5C"})
 	viewportStyle = lipgloss.NewStyle().Border(lipgloss.HiddenBorder(), false, true)
 )
 
 func (m *model) View() string {
+	builder := &strings.Builder{}
+	divider := dividerStyle.Render(strings.Repeat("-", m.viewport.Width)) + "\n"
 	if it := m.list.SelectedItem(); it != nil {
-		valueDetail := fmt.Sprintf("KeyType: %s\nValue:\n%s", it.(item).keyType, it.(item).val)
-		m.viewport.SetContent(wordwrap.String(valueDetail, m.viewport.Width))
+		key := fmt.Sprintf("Key: \n%s\n", it.(item).key)
+		keyType := fmt.Sprintf("KeyType: %s\n", it.(item).keyType)
+		value := fmt.Sprintf("Value: \n%s\n", it.(item).val)
+		builder.WriteString(wordwrap.String(key, m.viewport.Width))
+		builder.WriteString(divider)
+		builder.WriteString(wordwrap.String(keyType, m.viewport.Width))
+		builder.WriteString(divider)
+		builder.WriteString(wordwrap.String(value, m.viewport.Width))
+	} else {
+		builder.WriteString("No item selected")
 	}
+	valueDetail := builder.String()
+	m.viewport.SetContent(wordwrap.String(valueDetail, m.viewport.Width))
 
 	if m.state == searchState {
 		m.stateDesc = m.textinput.View()

@@ -107,7 +107,11 @@ func (m *model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		cmds = append(cmds, cmd)
 	case scanMsg:
 		m.list.SetItems(msg.items)
-		m.stateDesc = fmt.Sprintf("%d keys found", msg.count)
+		if msg.count > maxScanCount {
+			m.stateDesc = fmt.Sprintf("%d+ keys found", maxScanCount)
+		} else {
+			m.stateDesc = fmt.Sprintf("%d keys found", msg.count)
+		}
 	case tea.MouseMsg:
 		m.handleMouse(msg)
 	case tea.KeyMsg:
