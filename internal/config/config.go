@@ -30,7 +30,7 @@ type Config struct {
 	Password string `mapstructure:"password"`
 	DB       int    `mapstructure:"db"`
 
-	Count int `mapstructure:"count"`
+	Count int64 `mapstructure:"count"`
 }
 
 // LoadConfig loads a users config and creates the config if it does not exist.

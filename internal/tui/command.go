@@ -7,6 +7,7 @@ package tui
 import (
 	"context"
 	"fmt"
+	"redis-viewer/internal/config"
 	"redis-viewer/internal/util"
 
 	"github.com/charmbracelet/bubbles/list"
@@ -24,6 +25,7 @@ type scanMsg struct {
 
 func (m model) scanCmd() tea.Cmd {
 	return func() tea.Msg {
+		cfg := config.GetConfig()
 		ctx := context.Background()
 		var (
 			val   interface{}
@@ -31,7 +33,7 @@ func (m model) scanCmd() tea.Cmd {
 			items []list.Item
 		)
 
-		keys, _, err := m.rdb.Scan(ctx, 0, m.searchValue, defaultScanCount).Result()
+		keys, _, err := m.rdb.Scan(ctx, 0, m.searchValue, cfg.Count).Result()
 		if err != nil {
 			return errMsg{err: err}
 		}
