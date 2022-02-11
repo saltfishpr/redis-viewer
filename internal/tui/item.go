@@ -4,7 +4,9 @@
 
 package tui
 
-import "strconv"
+import (
+	"fmt"
+)
 
 type item struct {
 	keyType string
@@ -20,6 +22,6 @@ func (i item) Description() string {
 	if i.err {
 		return "get error: " + i.val
 	}
-	return "keySize: " + strconv.Itoa(len(i.key)) + ", valueSize: " + strconv.Itoa(len(i.val))
+	return fmt.Sprintf("key: %d bytes, value: %d bytes", len(i.key), len(i.val))
 }
 func (i item) FilterValue() string { return i.key }
