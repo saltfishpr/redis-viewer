@@ -17,3 +17,5 @@
 # My Project
 output
 logs
+
+dist/
