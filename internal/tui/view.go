@@ -67,6 +67,10 @@ func (m model) statusView() string {
 	default:
 		status = "Ready"
 		statusDesc = m.statusMessage
+		if !m.ready {
+			status = m.spinner.View()
+			statusDesc = "Loading..."
+		}
 	}
 
 	statusKey := statusStyle.Render(status)

@@ -40,8 +40,8 @@ func (m *model) handleKeys(msg tea.KeyMsg) tea.Cmd {
 				m.textinput.Focus()
 				return textinput.Blink
 			case key.Matches(msg, m.keyMap.scan):
-				cmd = m.scanCmd()
-				cmds = append(cmds, cmd)
+				m.ready = false
+				cmds = append(cmds, m.scanCmd(), m.countCmd())
 			}
 		case tea.KeyCtrlC:
 			cmd = tea.Quit
@@ -66,8 +66,8 @@ func (m *model) handleKeys(msg tea.KeyMsg) tea.Cmd {
 			m.textinput.Reset()
 			m.state = defaultState
 
-			cmd = m.scanCmd()
-			cmds = append(cmds, cmd)
+			m.ready = false
+			cmds = append(cmds, m.scanCmd(), m.countCmd())
 		default:
 			m.textinput, cmd = m.textinput.Update(msg)
 			cmds = append(cmds, cmd)
@@ -100,11 +100,13 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		m.viewport.SetContent(m.detailView())
 	case scanMsg:
 		m.list.SetItems(msg.items)
+	case countMsg:
 		if msg.count > maxScanCount {
 			m.statusMessage = fmt.Sprintf("%d+ keys found", maxScanCount)
 		} else {
 			m.statusMessage = fmt.Sprintf("%d keys found", msg.count)
 		}
+		m.ready = true
 	case tea.MouseMsg:
 		m.handleMouse(msg)
 	case tea.KeyMsg:
@@ -118,6 +120,9 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		cmds = append(cmds, cmd)
 
 		m.viewport, cmd = m.viewport.Update(msg)
+		cmds = append(cmds, cmd)
+
+		m.spinner, cmd = m.spinner.Update(msg)
 		cmds = append(cmds, cmd)
 	}
 
