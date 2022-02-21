@@ -8,8 +8,8 @@ import (
 	"context"
 	"fmt"
 
-	"redis-viewer/internal/config"
-	"redis-viewer/internal/util"
+	"github.com/SaltFishPr/redis-viewer/internal/config"
+	"github.com/SaltFishPr/redis-viewer/internal/util"
 
 	"github.com/charmbracelet/bubbles/list"
 	tea "github.com/charmbracelet/bubbletea"

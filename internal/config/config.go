@@ -11,7 +11,7 @@ import (
 	"path/filepath"
 	"runtime"
 
-	"redis-viewer/internal/util"
+	"github.com/SaltFishPr/redis-viewer/internal/util"
 
 	"github.com/spf13/viper"
 )

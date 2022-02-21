@@ -5,8 +5,8 @@ import (
 	"log"
 	"os"
 
-	"redis-viewer/internal/config"
-	"redis-viewer/internal/tui"
+	"github.com/SaltFishPr/redis-viewer/internal/config"
+	"github.com/SaltFishPr/redis-viewer/internal/tui"
 
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/go-redis/redis/v8"
