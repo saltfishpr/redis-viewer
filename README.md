@@ -4,6 +4,14 @@ A tool to view Redis data in terminal.
 
 ![user interface](images/ui.png)
 
+## Install
+
+Go version >=1.16: `go install github.com/SaltFishPr/redis-viewer@latest`
+
+or
+
+Download from [Release](https://github.com/SaltFishPr/redis-viewer/releases).
+
 ## Usage:
 
 | KeyBoard | Description            |
@@ -52,7 +60,7 @@ In Windows, you should change system encoding to `UTF-8` before run this program
 
 ## TODOs:
 
--   [ ] Add load animation.
+-   [x] Add load animation.
 -   [ ] Friendly value detail.
 -   [ ] Add log view.
 
