@@ -19,10 +19,11 @@ run:
 clean:
 	sh scripts/clean.sh
 
-.PHONY: generate
-# run go generate
-generate:
-	go generate ./...
+.PHONY: release
+# release a version and push to github
+release:
+	git tag -a v$(VERSION) -m "Release $(VERSION)"
+	goreleaser release --rm-dist
 
 # show help
 help:

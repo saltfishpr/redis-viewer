@@ -8,8 +8,8 @@ import (
 	"context"
 	"fmt"
 
-	"redis-viewer/internal/config"
-	"redis-viewer/internal/util"
+	"github.com/SaltFishPr/redis-viewer/internal/config"
+	"github.com/SaltFishPr/redis-viewer/internal/util"
 
 	"github.com/charmbracelet/bubbles/list"
 	tea "github.com/charmbracelet/bubbletea"
@@ -21,6 +21,9 @@ type errMsg struct {
 
 type scanMsg struct {
 	items []list.Item
+}
+
+type countMsg struct {
 	count int
 }
 
@@ -63,7 +66,15 @@ func (m model) scanCmd() tea.Cmd {
 			}
 		}
 
+		return scanMsg{items: items}
+	}
+}
+
+func (m model) countCmd() tea.Cmd {
+	return func() tea.Msg {
+		ctx := context.Background()
 		var count int
+
 		iter := m.rdb.Scan(ctx, 0, m.searchValue, 0).Iterator()
 		for iter.Next(ctx) {
 			count++
@@ -75,6 +86,6 @@ func (m model) scanCmd() tea.Cmd {
 			return errMsg{err: err}
 		}
 
-		return scanMsg{items: items, count: count}
+		return countMsg{count: count}
 	}
 }

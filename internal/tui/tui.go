@@ -6,6 +6,7 @@ package tui
 
 import (
 	"github.com/charmbracelet/bubbles/list"
+	"github.com/charmbracelet/bubbles/spinner"
 	"github.com/charmbracelet/bubbles/textinput"
 	"github.com/charmbracelet/bubbles/viewport"
 	"github.com/charmbracelet/lipgloss"
@@ -18,10 +19,12 @@ type model struct {
 	list      list.Model
 	textinput textinput.Model
 	viewport  viewport.Model
+	spinner   spinner.Model
 
 	rdb           *redis.Client
 	searchValue   string
 	statusMessage string
+	ready         bool
 
 	keyMap
 	state
@@ -39,9 +42,13 @@ func New(rdb *redis.Client) *model {
 	l.SetShowHelp(false)
 	l.SetFilteringEnabled(false)
 
+	s := spinner.New()
+	s.Spinner = spinner.Dot
+
 	return &model{
 		list:      l,
 		textinput: t,
+		spinner:   s,
 
 		rdb: rdb,
 
