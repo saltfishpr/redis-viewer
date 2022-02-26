@@ -22,20 +22,28 @@ var rootCmd = &cobra.Command{
 		config.LoadConfig()
 		cfg := config.GetConfig()
 
-		var rdb *redis.Client
+		var rdb redis.Cmdable
 		switch cfg.Mode {
 		case "sentinel":
 			rdb = redis.NewFailoverClient(
 				&redis.FailoverOptions{
 					MasterName:    cfg.MasterName,
 					SentinelAddrs: cfg.SentinelAddrs,
+					Username:      cfg.Username,
 					Password:      cfg.Password,
 				},
 			)
+		case "cluster":
+			rdb = redis.NewClusterClient(&redis.ClusterOptions{
+				Addrs:    cfg.ClusterAddrs,
+				Username: cfg.Username,
+				Password: cfg.Password,
+			})
 		default:
 			rdb = redis.NewClient(
 				&redis.Options{
 					Addr:     cfg.Addr,
+					Username: cfg.Username,
 					Password: cfg.Password,
 					DB:       cfg.DB,
 				},

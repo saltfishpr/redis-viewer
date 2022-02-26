@@ -21,7 +21,7 @@ type model struct {
 	viewport  viewport.Model
 	spinner   spinner.Model
 
-	rdb           *redis.Client
+	rdb           redis.Cmdable
 	searchValue   string
 	statusMessage string
 	ready         bool
@@ -30,7 +30,7 @@ type model struct {
 	state
 }
 
-func New(rdb *redis.Client) *model {
+func New(rdb redis.Cmdable) *model {
 	t := textinput.New()
 	t.Prompt = "> "
 	t.Placeholder = "Search Key"
