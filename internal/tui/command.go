@@ -7,6 +7,7 @@ package tui
 import (
 	"context"
 	"fmt"
+	"time"
 
 	"github.com/SaltFishPr/redis-viewer/internal/config"
 	"github.com/SaltFishPr/redis-viewer/internal/util"
@@ -21,10 +22,6 @@ type errMsg struct {
 
 type scanMsg struct {
 	items []list.Item
-}
-
-type countMsg struct {
-	count int
 }
 
 func (m model) scanCmd() tea.Cmd {
@@ -70,6 +67,10 @@ func (m model) scanCmd() tea.Cmd {
 	}
 }
 
+type countMsg struct {
+	count int
+}
+
 func (m model) countCmd() tea.Cmd {
 	return func() tea.Msg {
 		ctx := context.Background()
@@ -88,4 +89,14 @@ func (m model) countCmd() tea.Cmd {
 
 		return countMsg{count: count}
 	}
+}
+
+type tickMsg struct {
+	t string
+}
+
+func (m model) tickCmd() tea.Cmd {
+	return tea.Every(time.Second, func(_ time.Time) tea.Msg {
+		return tickMsg{t: time.Now().Format("2006-01-02 15:04:05")}
+	})
 }

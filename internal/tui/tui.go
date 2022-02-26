@@ -25,6 +25,7 @@ type model struct {
 	searchValue   string
 	statusMessage string
 	ready         bool
+	time          string
 
 	keyMap
 	state

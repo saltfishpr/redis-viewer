@@ -38,20 +38,23 @@ config file directory:
 example config file:
 
 ```yaml
-mode: client
+mode: normal
+
+username:
+password:
+db:
 
 addr: 127.0.0.1:6379
 
 master_name:
 sentinel_addrs:
 
-password: "123456"
-db: 0
+cluster_addrs:
 ```
 
 ## Support:
 
--   client and sentinel connection.
+-   client, sentinel and cluster mode.
 -   `string, hash, list, set, zset` key types.
 
 ## Note:

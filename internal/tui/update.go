@@ -112,6 +112,9 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	case tea.KeyMsg:
 		cmd = m.handleKeys(msg)
 		cmds = append(cmds, cmd)
+	case tickMsg:
+		m.time = msg.t
+		cmds = append(cmds, m.tickCmd())
 	default:
 		m.list, cmd = m.list.Update(msg)
 		cmds = append(cmds, cmd)

@@ -6,5 +6,5 @@ package tui
 import tea "github.com/charmbracelet/bubbletea"
 
 func (m model) Init() tea.Cmd {
-	return tea.Batch(m.spinner.Tick, m.scanCmd(), m.countCmd())
+	return tea.Batch(m.tickCmd(), m.spinner.Tick, m.scanCmd(), m.countCmd())
 }
