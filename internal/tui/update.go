@@ -6,6 +6,8 @@ package tui
 import (
 	"fmt"
 
+	"github.com/SaltFishPr/redis-viewer/internal/constant"
+
 	"github.com/charmbracelet/bubbles/key"
 	"github.com/charmbracelet/bubbles/textinput"
 	"github.com/charmbracelet/bubbles/viewport"
@@ -17,10 +19,10 @@ import (
 func (m *model) handleMouse(msg tea.MouseMsg) {
 	switch msg.Type {
 	case tea.MouseWheelUp:
-		m.viewport.LineUp(mouseScrollSpeed)
+		m.viewport.LineUp(constant.MouseScrollSpeed)
 		m.viewport.SetContent(m.detailView())
 	case tea.MouseWheelDown:
-		m.viewport.LineDown(mouseScrollSpeed)
+		m.viewport.LineDown(constant.MouseScrollSpeed)
 		m.viewport.SetContent(m.detailView())
 	}
 }
@@ -91,7 +93,7 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		statusBarHeight := lipgloss.Height(m.statusView())
 		height := m.height - statusBarHeight
 
-		listViewWidth := int(listProportion * float64(m.width))
+		listViewWidth := int(constant.ListProportion * float64(m.width))
 		listWidth := listViewWidth - listViewStyle.GetHorizontalFrameSize()
 		m.list.SetSize(listWidth, height)
 
@@ -101,8 +103,8 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	case scanMsg:
 		m.list.SetItems(msg.items)
 	case countMsg:
-		if msg.count > maxScanCount {
-			m.statusMessage = fmt.Sprintf("%d+ keys found", maxScanCount)
+		if msg.count > constant.MaxScanCount {
+			m.statusMessage = fmt.Sprintf("%d+ keys found", constant.MaxScanCount)
 		} else {
 			m.statusMessage = fmt.Sprintf("%d keys found", msg.count)
 		}

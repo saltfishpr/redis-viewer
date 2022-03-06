@@ -38,18 +38,19 @@ config file directory:
 example config file:
 
 ```yaml
-mode: normal
+addrs:
+    - 127.0.0.1:6380
+    - 127.0.0.1:6381
+    - 127.0.0.1:6382
+    - 127.0.0.1:6383
+    - 127.0.0.1:6384
+    - 127.0.0.1:6385
 
+db:
 username:
 password:
-db:
-
-addr: 127.0.0.1:6379
 
 master_name:
-sentinel_addrs:
-
-cluster_addrs:
 ```
 
 ## Support:

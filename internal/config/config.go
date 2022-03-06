@@ -18,21 +18,13 @@ import (
 
 // Config represents the main config for the application.
 type Config struct {
-	Mode string `mapstructure:"mode"` // can be client, sentinel, cluster
-
-	Username string `mapstructure:"username"`
-	Password string `mapstructure:"password"`
-	DB       int    `mapstructure:"db"`
-
-	// client
-	Addr string `mapstructure:"addr"`
+	Addrs    []string `mapstructure:"addrs"`
+	DB       int      `mapstructure:"db"`
+	Username string   `mapstructure:"username"`
+	Password string   `mapstructure:"password"`
 
 	// sentinel
-	MasterName    string   `mapstructure:"master_name"`
-	SentinelAddrs []string `mapstructure:"sentinel_addrs"`
-
-	// cluster
-	ClusterAddrs []string `mapstructure:"cluster_addrs"`
+	MasterName string `mapstructure:"master_name"`
 
 	Count int64 `mapstructure:"count"` // default 20
 }
