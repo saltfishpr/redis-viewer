@@ -18,19 +18,15 @@ import (
 
 // Config represents the main config for the application.
 type Config struct {
-	Mode string `mapstructure:"mode"`
-
-	// client
-	Addr string `mapstructure:"addr"`
+	Addrs    []string `mapstructure:"addrs"`
+	DB       int      `mapstructure:"db"`
+	Username string   `mapstructure:"username"`
+	Password string   `mapstructure:"password"`
 
 	// sentinel
-	MasterName    string   `mapstructure:"master_name"`
-	SentinelAddrs []string `mapstructure:"sentinel_addrs"`
+	MasterName string `mapstructure:"master_name"`
 
-	Password string `mapstructure:"password"`
-	DB       int    `mapstructure:"db"`
-
-	Count int64 `mapstructure:"count"`
+	Count int64 `mapstructure:"count"` // default 20
 }
 
 // LoadConfig loads a users config and creates the config if it does not exist.

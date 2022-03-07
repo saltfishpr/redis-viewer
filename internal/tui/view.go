@@ -6,7 +6,6 @@ package tui
 import (
 	"fmt"
 	"strings"
-	"time"
 
 	"github.com/charmbracelet/lipgloss"
 	"github.com/muesli/reflow/wordwrap"
@@ -75,7 +74,7 @@ func (m model) statusView() string {
 
 	statusKey := statusStyle.Render(status)
 	encoding := encodingStyle.Render("UTF-8")
-	datetime := datetimeStyle.Render(time.Now().Format("2006-01-02 15:04:05"))
+	datetime := datetimeStyle.Render(m.time)
 
 	statusVal := statusText.Copy().
 		Width(m.width - lipgloss.Width(statusKey) - lipgloss.Width(encoding) - lipgloss.Width(datetime)).

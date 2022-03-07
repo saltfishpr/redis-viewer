@@ -13,6 +13,13 @@ import (
 	"github.com/go-redis/redis/v8"
 )
 
+type state int
+
+const (
+	defaultState state = iota
+	searchState
+)
+
 type model struct {
 	width, height int
 
@@ -21,16 +28,17 @@ type model struct {
 	viewport  viewport.Model
 	spinner   spinner.Model
 
-	rdb           *redis.Client
+	rdb           redis.UniversalClient
 	searchValue   string
 	statusMessage string
 	ready         bool
+	time          string
 
 	keyMap
 	state
 }
 
-func New(rdb *redis.Client) *model {
+func New(rdb redis.UniversalClient) *model {
 	t := textinput.New()
 	t.Prompt = "> "
 	t.Placeholder = "Search Key"

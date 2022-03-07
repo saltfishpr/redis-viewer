@@ -6,6 +6,7 @@ import (
 	"os"
 
 	"github.com/SaltFishPr/redis-viewer/internal/config"
+	"github.com/SaltFishPr/redis-viewer/internal/constant"
 	"github.com/SaltFishPr/redis-viewer/internal/tui"
 
 	tea "github.com/charmbracelet/bubbletea"
@@ -22,26 +23,15 @@ var rootCmd = &cobra.Command{
 		config.LoadConfig()
 		cfg := config.GetConfig()
 
-		var rdb *redis.Client
-		switch cfg.Mode {
-		case "sentinel":
-			rdb = redis.NewFailoverClient(
-				&redis.FailoverOptions{
-					MasterName:    cfg.MasterName,
-					SentinelAddrs: cfg.SentinelAddrs,
-					Password:      cfg.Password,
-				},
-			)
-		default:
-			rdb = redis.NewClient(
-				&redis.Options{
-					Addr:     cfg.Addr,
-					Password: cfg.Password,
-					DB:       cfg.DB,
-				},
-			)
-		}
-
+		rdb := redis.NewUniversalClient(&redis.UniversalOptions{
+			Addrs:        cfg.Addrs,
+			DB:           cfg.DB,
+			Username:     cfg.Username,
+			Password:     cfg.Password,
+			MaxRetries:   constant.MaxRetries,
+			MaxRedirects: constant.MaxRedirects,
+			MasterName:   cfg.MasterName,
+		})
 		_, err := rdb.Ping(context.Background()).Result()
 		if err != nil {
 			log.Fatal("connect to redis failed: ", err)

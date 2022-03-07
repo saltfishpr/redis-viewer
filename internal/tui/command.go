@@ -7,8 +7,10 @@ package tui
 import (
 	"context"
 	"fmt"
+	"time"
 
 	"github.com/SaltFishPr/redis-viewer/internal/config"
+	"github.com/SaltFishPr/redis-viewer/internal/rv"
 	"github.com/SaltFishPr/redis-viewer/internal/util"
 
 	"github.com/charmbracelet/bubbles/list"
@@ -23,10 +25,6 @@ type scanMsg struct {
 	items []list.Item
 }
 
-type countMsg struct {
-	count int
-}
-
 func (m model) scanCmd() tea.Cmd {
 	return func() tea.Msg {
 		cfg := config.GetConfig()
@@ -37,11 +35,8 @@ func (m model) scanCmd() tea.Cmd {
 			items []list.Item
 		)
 
-		keys, _, err := m.rdb.Scan(ctx, 0, m.searchValue, cfg.Count).Result()
-		if err != nil {
-			return errMsg{err: err}
-		}
-		for _, key := range keys {
+		keys := rv.GetKeys(m.rdb, 0, m.searchValue, cfg.Count)
+		for key := range keys {
 			kt := m.rdb.Type(ctx, key).Val()
 			switch kt {
 			case "string":
@@ -70,22 +65,27 @@ func (m model) scanCmd() tea.Cmd {
 	}
 }
 
+type countMsg struct {
+	count int
+}
+
 func (m model) countCmd() tea.Cmd {
 	return func() tea.Msg {
-		ctx := context.Background()
-		var count int
-
-		iter := m.rdb.Scan(ctx, 0, m.searchValue, 0).Iterator()
-		for iter.Next(ctx) {
-			count++
-			if count > maxScanCount {
-				break
-			}
-		}
-		if err := iter.Err(); err != nil {
+		count, err := rv.CountKeys(m.rdb, m.searchValue)
+		if err != nil {
 			return errMsg{err: err}
 		}
 
 		return countMsg{count: count}
 	}
+}
+
+type tickMsg struct {
+	t string
+}
+
+func (m model) tickCmd() tea.Cmd {
+	return tea.Tick(time.Second, func(_ time.Time) tea.Msg {
+		return tickMsg{t: time.Now().Format("2006-01-02 15:04:05")}
+	})
 }
