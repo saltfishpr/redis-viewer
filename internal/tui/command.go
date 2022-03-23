@@ -9,9 +9,9 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/SaltFishPr/redis-viewer/internal/config"
-	"github.com/SaltFishPr/redis-viewer/internal/rv"
-	"github.com/SaltFishPr/redis-viewer/internal/util"
+	"github.com/saltfishpr/redis-viewer/internal/config"
+	"github.com/saltfishpr/redis-viewer/internal/rv"
+	"github.com/saltfishpr/redis-viewer/internal/util"
 
 	"github.com/charmbracelet/bubbles/list"
 	tea "github.com/charmbracelet/bubbletea"

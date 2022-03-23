@@ -45,7 +45,7 @@ func New(rdb redis.UniversalClient) *model {
 	t.PlaceholderStyle = lipgloss.NewStyle()
 
 	l := list.New(nil, list.NewDefaultDelegate(), 0, 0)
-	l.Title = "Redis Viewer by SaltFishPr"
+	l.Title = "Redis Viewer by saltfishpr"
 	l.SetShowFilter(false)
 	l.SetShowHelp(false)
 	l.SetFilteringEnabled(false)

@@ -8,7 +8,7 @@ import (
 	"context"
 	"sync/atomic"
 
-	"github.com/SaltFishPr/redis-viewer/internal/constant"
+	"github.com/saltfishpr/redis-viewer/internal/constant"
 
 	"github.com/go-redis/redis/v8"
 )

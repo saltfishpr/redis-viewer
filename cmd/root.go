@@ -5,9 +5,9 @@ import (
 	"log"
 	"os"
 
-	"github.com/SaltFishPr/redis-viewer/internal/config"
-	"github.com/SaltFishPr/redis-viewer/internal/constant"
-	"github.com/SaltFishPr/redis-viewer/internal/tui"
+	"github.com/saltfishpr/redis-viewer/internal/config"
+	"github.com/saltfishpr/redis-viewer/internal/constant"
+	"github.com/saltfishpr/redis-viewer/internal/tui"
 
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/go-redis/redis/v8"

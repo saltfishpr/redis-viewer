@@ -22,7 +22,6 @@ clean:
 .PHONY: release
 # release a version and push to github
 release:
-	git tag -a v$(VERSION) -m "Release $(VERSION)"
 	goreleaser release --rm-dist
 
 # show help

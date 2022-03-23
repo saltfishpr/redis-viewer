@@ -6,7 +6,7 @@ package tui
 import (
 	"fmt"
 
-	"github.com/SaltFishPr/redis-viewer/internal/constant"
+	"github.com/saltfishpr/redis-viewer/internal/constant"
 
 	"github.com/charmbracelet/bubbles/key"
 	"github.com/charmbracelet/bubbles/textinput"

@@ -8,7 +8,7 @@ import (
 	"fmt"
 	"sync/atomic"
 
-	"github.com/SaltFishPr/redis-viewer/internal/config"
+	"github.com/saltfishpr/redis-viewer/internal/config"
 
 	"github.com/go-redis/redis/v8"
 )

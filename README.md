@@ -6,11 +6,11 @@ A tool to view Redis data in terminal.
 
 ## Install
 
-Go version >=1.16: `go install github.com/SaltFishPr/redis-viewer@latest`
+Go version >=1.16: `go install github.com/saltfishpr/redis-viewer@latest`
 
 or
 
-Download from [Release](https://github.com/SaltFishPr/redis-viewer/releases).
+Download from [Release](https://github.com/saltfishpr/redis-viewer/releases).
 
 ## Usage:
 
