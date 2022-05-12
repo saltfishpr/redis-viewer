@@ -31,21 +31,19 @@ type Config struct {
 
 // LoadConfig loads a users config and creates the config if it does not exist.
 func LoadConfig() {
-	if runtime.GOOS != "windows" {
-		homeDir, err := util.GetHomeDirectory()
-		if err != nil {
-			log.Fatal(err)
-		}
-
-		err = util.CreateDirectory(filepath.Join(homeDir, ".config", "redis-viewer"))
-		if err != nil {
-			log.Fatal(err)
-		}
-
-		viper.AddConfigPath("$HOME/.config/redis-viewer")
-	} else {
-		viper.AddConfigPath("$HOME")
+	configPath, err := util.GetHomeDirectory()
+	if err != nil {
+		log.Fatal(err)
 	}
+
+	if runtime.GOOS != "windows" {
+		configPath = filepath.Join(configPath, ".config", "redis-viewer")
+		if err = util.CreateDirectory(configPath); err != nil {
+			log.Fatal(err)
+		}
+	}
+
+	viper.AddConfigPath(configPath)
 
 	viper.SetConfigName("redis-viewer")
 	viper.SetConfigType("yml")
