@@ -2,6 +2,7 @@ package cmd
 
 import (
 	"context"
+	"github.com/spf13/viper"
 	"log"
 	"os"
 
@@ -63,4 +64,13 @@ func init() {
 	// Cobra also supports local flags, which will only run
 	// when this action is called directly.
 	rootCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
+	rootCmd.Flags().StringSliceP("address", "a", []string{"127.0.0.1:6379"}, "Redis address")
+	rootCmd.Flags().StringP("database", "d", "0", "Redis database to use")
+	rootCmd.Flags().StringP("username", "u", "", "Redis user")
+	rootCmd.Flags().StringP("password", "p", "", "Redis password for user")
+
+	viper.BindPFlag("Addrs", rootCmd.Flags().Lookup("address"))
+	viper.BindPFlag("DB", rootCmd.Flags().Lookup("database"))
+	viper.BindPFlag("Username", rootCmd.Flags().Lookup("username"))
+	viper.BindPFlag("Password", rootCmd.Flags().Lookup("password"))
 }
