@@ -14,6 +14,8 @@ Download from [Release](https://github.com/saltfishpr/redis-viewer/releases).
 
 ## Usage:
 
+See help: `redis-viewer --help`
+
 | KeyBoard | Description            |
 | :------: | :--------------------- |
 |  ctrl+c  | exit redis viewer      |
@@ -30,7 +32,7 @@ Download from [Release](https://github.com/saltfishpr/redis-viewer/releases).
 |  scroll up  | detail scroll up   |
 | scroll down | detail scroll down |
 
-default config file directory is `$HOME/.redis-viewer.yaml`
+default config file path is `$HOME/.redis-viewer.yaml`
 
 example config file:
 

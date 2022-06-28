@@ -56,7 +56,10 @@ func (m model) scanCmd() tea.Cmd {
 				err = fmt.Errorf("unsupported type: %s", kt)
 			}
 			if err != nil {
-				items = append(items, item{keyType: kt, key: keyMessage.Key, val: err.Error(), err: true})
+				items = append(
+					items,
+					item{keyType: kt, key: keyMessage.Key, val: err.Error(), err: true},
+				)
 			} else {
 				valBts, _ := util.JsonMarshalIndent(val)
 				items = append(items, item{keyType: kt, key: keyMessage.Key, val: string(valBts)})
