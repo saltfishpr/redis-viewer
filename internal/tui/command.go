@@ -9,12 +9,12 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/saltfishpr/redis-viewer/internal/config"
 	"github.com/saltfishpr/redis-viewer/internal/rv"
 	"github.com/saltfishpr/redis-viewer/internal/util"
 
 	"github.com/charmbracelet/bubbles/list"
 	tea "github.com/charmbracelet/bubbletea"
+	"github.com/spf13/cast"
 )
 
 type errMsg struct {
@@ -27,7 +27,6 @@ type scanMsg struct {
 
 func (m model) scanCmd() tea.Cmd {
 	return func() tea.Msg {
-		cfg := config.GetConfig()
 		ctx := context.Background()
 		var (
 			val   interface{}
@@ -35,29 +34,32 @@ func (m model) scanCmd() tea.Cmd {
 			items []list.Item
 		)
 
-		keys := rv.GetKeys(m.rdb, 0, m.searchValue, cfg.Count)
-		for key := range keys {
-			kt := m.rdb.Type(ctx, key).Val()
+		keyMessages := rv.GetKeys(m.rdb, cast.ToUint64(m.offset*m.limit), m.searchValue, m.limit)
+		for keyMessage := range keyMessages {
+			if keyMessage.Err != nil {
+				return errMsg{err: keyMessage.Err}
+			}
+			kt := m.rdb.Type(ctx, keyMessage.Key).Val()
 			switch kt {
 			case "string":
-				val, err = m.rdb.Get(ctx, key).Result()
+				val, err = m.rdb.Get(ctx, keyMessage.Key).Result()
 			case "list":
-				val, err = m.rdb.LRange(ctx, key, 0, -1).Result()
+				val, err = m.rdb.LRange(ctx, keyMessage.Key, 0, -1).Result()
 			case "set":
-				val, err = m.rdb.SMembers(ctx, key).Result()
+				val, err = m.rdb.SMembers(ctx, keyMessage.Key).Result()
 			case "zset":
-				val, err = m.rdb.ZRange(ctx, key, 0, -1).Result()
+				val, err = m.rdb.ZRange(ctx, keyMessage.Key, 0, -1).Result()
 			case "hash":
-				val, err = m.rdb.HGetAll(ctx, key).Result()
+				val, err = m.rdb.HGetAll(ctx, keyMessage.Key).Result()
 			default:
 				val = ""
 				err = fmt.Errorf("unsupported type: %s", kt)
 			}
 			if err != nil {
-				items = append(items, item{keyType: kt, key: key, val: err.Error(), err: true})
+				items = append(items, item{keyType: kt, key: keyMessage.Key, val: err.Error(), err: true})
 			} else {
 				valBts, _ := util.JsonMarshalIndent(val)
-				items = append(items, item{keyType: kt, key: key, val: string(valBts)})
+				items = append(items, item{keyType: kt, key: keyMessage.Key, val: string(valBts)})
 			}
 		}
 

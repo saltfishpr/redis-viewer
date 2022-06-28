@@ -30,10 +30,7 @@ Download from [Release](https://github.com/saltfishpr/redis-viewer/releases).
 |  scroll up  | detail scroll up   |
 | scroll down | detail scroll down |
 
-config file directory:
-
--   Windows: `%USERPROFILE%/redis-viewer.yml`
--   Linux: `~/.config/redis-viewer/redis-viewer.yml`
+default config file directory is `$HOME/.redis-viewer.yaml`
 
 example config file:
 
@@ -65,7 +62,7 @@ In Windows, you should change system encoding to `UTF-8` before run this program
 ## TODOs:
 
 -   [x] Add load animation.
--   [ ] Friendly value detail.
+-   [x] Friendly value detail.
 -   [ ] Add log view.
 
 Build with [bubbletea](https://github.com/charmbracelet/bubbletea).

@@ -1,12 +1,14 @@
-// @file: constant.go
-// @date: 2022/03/03
-
+// Package constant .
 package constant
+
+// default config
+const (
+	DefaultCount = 20
+)
 
 // redis
 const (
 	MaxRetries = 3
-
 	// cluster
 	MaxRedirects = 10
 

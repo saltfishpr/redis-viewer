@@ -1,7 +1,3 @@
-// @description: json序列化与反序列化
-// @file: json.go
-// @date: 2022/02/10
-
 package util
 
 import jsoniter "github.com/json-iterator/go"

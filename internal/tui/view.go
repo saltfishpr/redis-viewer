@@ -23,14 +23,13 @@ var (
 	statusBarStyle = lipgloss.NewStyle().
 			Foreground(lipgloss.AdaptiveColor{Light: "#343433", Dark: "#C1C6B2"}).
 			Background(lipgloss.AdaptiveColor{Light: "#D9DCCF", Dark: "#353533"})
-	statusStyle = lipgloss.NewStyle().
-			Inherit(statusBarStyle).
+	statusStyle = statusBarStyle.Copy().
 			Foreground(lipgloss.Color("#FFFDF5")).
 			Background(lipgloss.Color("#FF5F87")).
 			Padding(0, 1).
 			MarginRight(1)
 	encodingStyle = statusNugget.Copy().Background(lipgloss.Color("#A550DF")).Align(lipgloss.Right)
-	statusText    = lipgloss.NewStyle().Inherit(statusBarStyle)
+	statusText    = statusBarStyle.Copy()
 	datetimeStyle = statusNugget.Copy().Background(lipgloss.Color("#6124DF"))
 )
 
@@ -38,9 +37,9 @@ func (m model) listView() string {
 	return listViewStyle.Render(m.list.View())
 }
 
-func (m model) detailView() string {
-	builder := &strings.Builder{}
-	divider := dividerStyle.Render(strings.Repeat("-", m.viewport.Width)) + "\n"
+func (m model) viewportContent(width int) string {
+	var builder strings.Builder
+	divider := dividerStyle.Render(strings.Repeat("-", width)) + "\n"
 	if it := m.list.SelectedItem(); it != nil {
 		keyType := fmt.Sprintf("KeyType: %s\n", it.(item).keyType)
 		key := fmt.Sprintf("Key: \n%s\n", it.(item).key)
@@ -53,7 +52,12 @@ func (m model) detailView() string {
 	} else {
 		builder.WriteString("No item selected")
 	}
-	return wordwrap.String(builder.String(), m.viewport.Width)
+
+	return wordwrap.String(builder.String(), width)
+}
+
+func (m model) detailView() string {
+	return m.viewport.View()
 }
 
 func (m model) statusView() string {
@@ -74,7 +78,7 @@ func (m model) statusView() string {
 
 	statusKey := statusStyle.Render(status)
 	encoding := encodingStyle.Render("UTF-8")
-	datetime := datetimeStyle.Render(m.time)
+	datetime := datetimeStyle.Render(m.now)
 
 	statusVal := statusText.Copy().
 		Width(m.width - lipgloss.Width(statusKey) - lipgloss.Width(encoding) - lipgloss.Width(datetime)).
@@ -86,10 +90,9 @@ func (m model) statusView() string {
 }
 
 func (m model) View() string {
-	m.viewport.SetContent(m.detailView())
-	return lipgloss.JoinVertical(
-		lipgloss.Left,
-		lipgloss.JoinHorizontal(lipgloss.Top, m.listView(), m.viewport.View()),
+	// TODO: refresh status view only
+	return lipgloss.JoinVertical(lipgloss.Left,
+		lipgloss.JoinHorizontal(lipgloss.Top, m.listView(), m.detailView()),
 		m.statusView(),
 	)
 }

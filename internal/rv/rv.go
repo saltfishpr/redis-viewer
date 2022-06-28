@@ -1,7 +1,4 @@
-// @description:
-// @file: rv.go
-// @date: 2022/03/07
-
+// Package rv redis operation.
 package rv
 
 import (
@@ -57,18 +54,36 @@ func CountKeys(rdb redis.UniversalClient, match string) (int, error) {
 	}
 }
 
+//nolint:govet
+type keyMessage struct {
+	Key string
+	Err error
+}
+
 // GetKeys .
-func GetKeys(rdb redis.UniversalClient, cursor uint64, match string, count int64) <-chan string {
-	keys := make(chan string, 1)
+func GetKeys(
+	rdb redis.UniversalClient,
+	cursor uint64,
+	match string,
+	count int64,
+) <-chan keyMessage {
+	res := make(chan keyMessage, 1)
 
 	go func() {
 		ctx := context.TODO()
+
 		switch rdb := rdb.(type) {
 		case *redis.ClusterClient:
+			var i int64
+
 			err := rdb.ForEachMaster(ctx, func(ctx context.Context, client *redis.Client) error {
-				iter := client.Scan(ctx, cursor, match, count).Iterator()
+				iter := client.Scan(ctx, cursor, match, 0).Iterator()
 				for iter.Next(ctx) {
-					keys <- iter.Val()
+					atomic.AddInt64(&i, 1)
+					if i > count {
+						break
+					}
+					res <- keyMessage{iter.Val(), nil}
 				}
 				if err := iter.Err(); err != nil {
 					return err
@@ -76,19 +91,21 @@ func GetKeys(rdb redis.UniversalClient, cursor uint64, match string, count int64
 				return nil
 			})
 			if err != nil {
-
+				res <- keyMessage{"", err}
 			}
 		default:
-			iter := rdb.Scan(ctx, cursor, match, count).Iterator()
-			for iter.Next(ctx) {
-				keys <- iter.Val()
-			}
-			if err := iter.Err(); err != nil {
-
+			keys, _, err := rdb.Scan(ctx, cursor, match, count).Result()
+			if err != nil {
+				res <- keyMessage{"", err}
+			} else {
+				for _, key := range keys {
+					res <- keyMessage{key, nil}
+				}
 			}
 		}
-		close(keys)
+
+		close(res)
 	}()
 
-	return keys
+	return res
 }
