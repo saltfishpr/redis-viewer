@@ -1,70 +1,102 @@
 # Redis Viewer
 
-A tool to view Redis data in terminal.
+`redis-viewer` is a terminal UI for browsing Redis keys and inspecting values.
 
-![user interface](images/ui.png)
+![Redis Viewer UI](images/ui.png)
+
+Built with [Bubble Tea](https://github.com/charmbracelet/bubbletea).
+
+## Features
+
+- Browse Redis keys in a terminal UI
+- Inspect `string`, `hash`, `list`, `set`, and `zset` values
+- Search keys with Redis `SCAN` match patterns
+- Paginate through matched keys
 
 ## Install
 
-Go version >=1.16: `go install github.com/saltfishpr/redis-viewer@latest`
+### Go install
 
-or
+Requires Go `1.25` or newer:
 
-Download from [Release](https://github.com/saltfishpr/redis-viewer/releases).
+```bash
+go install github.com/saltfishpr/redis-viewer@latest
+```
 
-## Usage:
+### Download binary
 
-See help: `redis-viewer --help`
+Download a release from [GitHub Releases](https://github.com/saltfishpr/redis-viewer/releases).
 
-| KeyBoard | Description            |
-| :------: | :--------------------- |
-|  ctrl+c  | exit redis viewer      |
-|    ↑     | previous key           |
-|    ↓     | next key               |
-|    ←     | previous page          |
-|    →     | next page              |
-|    r     | reload data from redis |
-|    s     | enter search keywords  |
-|  enter   | apply scan with text   |
+## Usage
 
-|    Mouse    | Description        |
-| :---------: | :----------------- |
-|  scroll up  | detail scroll up   |
-| scroll down | detail scroll down |
+Show help:
 
-default config file path is `$HOME/.redis-viewer.yaml`
+```bash
+redis-viewer --help
+```
 
-example config file:
+Run with the default config file:
+
+```bash
+redis-viewer
+```
+
+Run with a specific config file:
+
+```bash
+redis-viewer --config ./redis-viewer.yaml
+```
+
+## Configuration
+
+Default config path:
+
+```text
+$HOME/.redis-viewer.yaml
+```
+
+Example:
 
 ```yaml
 addrs:
-    - 127.0.0.1:6380
-    - 127.0.0.1:6381
-    - 127.0.0.1:6382
-    - 127.0.0.1:6383
-    - 127.0.0.1:6384
-    - 127.0.0.1:6385
+  - 127.0.0.1:6379
 
-db:
-username:
-password:
+db: 0
+username: ""
+password: ""
 
-master_name:
+# Used for sentinel mode.
+master_name: ""
+
+# Number of keys shown per page.
+page_size: 20
 ```
 
-## Support:
+### Notes on connection modes
 
--   client, sentinel and cluster mode.
--   `string, hash, list, set, zset` key types.
+- Single node: set one address in `addrs`
+- Cluster: set multiple cluster node addresses in `addrs`
+- Sentinel: set sentinel addresses in `addrs` and set `master_name`
 
-## Note:
+## Keybindings
 
-In Windows, you should change system encoding to `UTF-8` before run this program.
+| Key       | Action               |
+| --------- | -------------------- |
+| `Ctrl+C`  | Quit                 |
+| `↑` / `↓` | Move selection       |
+| `←`       | Previous page        |
+| `→`       | Next page            |
+| `r`       | Reload current page  |
+| `s`       | Enter search mode    |
+| `Enter`   | Apply current search |
+| `Esc`     | Cancel search mode   |
 
-## TODOs:
+## Known Limitations
 
--   [x] Add load animation.
--   [x] Friendly value detail.
--   [ ] Add log view.
+- Only `string`, `hash`, `list`, `set`, and `zset` are rendered
+- Unsupported key types are shown as errors in the item detail
+- Windows system requires terminal encoding to be set to `UTF-8`
 
-Build with [bubbletea](https://github.com/charmbracelet/bubbletea).
+## License
+
+[MIT](LICENSE)

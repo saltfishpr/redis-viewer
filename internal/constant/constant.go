@@ -1,11 +1,6 @@
 // Package constant .
 package constant
 
-// default config
-const (
-	DefaultCount = 20
-)
-
 // redis
 const (
 	MaxRetries = 3

@@ -28,7 +28,6 @@ import (
 
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/saltfishpr/redis-viewer/internal/conf"
-	"github.com/saltfishpr/redis-viewer/internal/constant"
 	"github.com/saltfishpr/redis-viewer/internal/tui"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
@@ -50,7 +49,7 @@ var rootCmd = &cobra.Command{
 		}
 
 		p := tea.NewProgram(model, tea.WithAltScreen(), tea.WithMouseCellMotion())
-		if err := p.Start(); err != nil {
+		if _, err := p.Run(); err != nil {
 			log.Fatal("start failed: ", err)
 		}
 	},
@@ -91,7 +90,7 @@ func initConfig() {
 	viper.AutomaticEnv() // read in environment variables that match
 
 	viper.SetDefault("mode", "client")
-	viper.SetDefault("count", constant.DefaultCount)
+	viper.SetDefault("page_size", 20)
 
 	// If a config file is found, read it in.
 	if err := viper.ReadInConfig(); err == nil {

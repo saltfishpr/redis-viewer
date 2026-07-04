@@ -3,109 +3,127 @@ package rv
 
 import (
 	"context"
+	"errors"
 	"sync/atomic"
-
-	"github.com/saltfishpr/redis-viewer/internal/constant"
 
 	"github.com/go-redis/redis/v8"
 )
 
-// CountKeys .
-func CountKeys(rdb redis.UniversalClient, match string) (int, error) {
-	ctx := context.TODO()
+// errDone is a sentinel used to signal early exit from ForEachMaster without
+// treating it as a real error.
+var errDone = errors.New("done")
 
-	switch rdb := rdb.(type) {
-	case *redis.ClusterClient:
-		var count int64
-
-		err := rdb.ForEachMaster(ctx, func(ctx context.Context, client *redis.Client) error {
-			iter := client.Scan(ctx, 0, match, 0).Iterator()
-			for iter.Next(ctx) {
-				atomic.AddInt64(&count, 1)
-				if count > constant.MaxScanCount {
-					break
-				}
-			}
-			if err := iter.Err(); err != nil {
-				return err
-			}
-			return nil
-		})
-		if err != nil {
-			return 0, err
-		}
-
-		return int(count), nil
-	default:
-		var count int
-
-		iter := rdb.Scan(ctx, 0, match, 0).Iterator()
-		for iter.Next(ctx) {
-			count++
-			if count > constant.MaxScanCount {
-				break
-			}
-		}
-		if err := iter.Err(); err != nil {
-			return 0, err
-		}
-
-		return count, nil
-	}
-}
-
-//nolint:govet
-type keyMessage struct {
+type KeyMessage struct {
 	Key string
 	Err error
 }
 
-// GetKeys .
-func GetKeys(
-	rdb redis.UniversalClient,
-	cursor uint64,
-	match string,
-	count int64,
-) <-chan keyMessage {
-	res := make(chan keyMessage, 1)
+// ScanKeys scans matched keys and returns one page of results (offset/limit).
+// It is compatible with both standalone Redis and Redis Cluster.
+func ScanKeys(rdb redis.UniversalClient, match string, offset, limit int64) <-chan KeyMessage {
+	res := make(chan KeyMessage)
 
 	go func() {
-		ctx := context.TODO()
+		defer close(res)
 
-		switch rdb := rdb.(type) {
-		case *redis.ClusterClient:
-			var i int64
+		ctx := context.Background()
+		if limit <= 0 {
+			return
+		}
 
-			err := rdb.ForEachMaster(ctx, func(ctx context.Context, client *redis.Client) error {
-				iter := client.Scan(ctx, cursor, match, 0).Iterator()
-				for iter.Next(ctx) {
-					atomic.AddInt64(&i, 1)
-					if i > count {
-						break
-					}
-					res <- keyMessage{iter.Val(), nil}
-				}
-				if err := iter.Err(); err != nil {
+		pattern := normalizeMatch(match)
+		var skipped int64
+		var sent int64
+
+		scanNode := func(ctx context.Context, client redis.UniversalClient) error {
+			var cursor uint64
+			for {
+				keys, next, err := client.Scan(ctx, cursor, pattern, 100).Result()
+				if err != nil {
 					return err
 				}
-				return nil
-			})
-			if err != nil {
-				res <- keyMessage{"", err}
-			}
-		default:
-			keys, _, err := rdb.Scan(ctx, cursor, match, count).Result()
-			if err != nil {
-				res <- keyMessage{"", err}
-			} else {
+
 				for _, key := range keys {
-					res <- keyMessage{key, nil}
+					if skipped < offset {
+						skipped++
+						continue
+					}
+					if sent >= limit {
+						return errDone
+					}
+
+					res <- KeyMessage{Key: key}
+					sent++
+				}
+
+				cursor = next
+				if cursor == 0 {
+					return nil
 				}
 			}
 		}
 
-		close(res)
+		var err error
+		if cc, ok := rdb.(*redis.ClusterClient); ok {
+			err = cc.ForEachMaster(ctx, func(ctx context.Context, c *redis.Client) error {
+				return scanNode(ctx, c)
+			})
+		} else {
+			err = scanNode(ctx, rdb)
+		}
+
+		if errors.Is(err, errDone) {
+			err = nil
+		}
+		if err != nil {
+			res <- KeyMessage{Err: err}
+		}
 	}()
 
 	return res
+}
+
+// CountKeys returns the total number of keys matching match.
+// It is compatible with both standalone Redis and Redis Cluster.
+func CountKeys(rdb redis.UniversalClient, match string) (int64, error) {
+	ctx := context.Background()
+	pattern := normalizeMatch(match)
+	var total atomic.Int64
+
+	countNode := func(ctx context.Context, client redis.UniversalClient) error {
+		var cursor uint64
+		for {
+			keys, next, err := client.Scan(ctx, cursor, pattern, 100).Result()
+			if err != nil {
+				return err
+			}
+			total.Add(int64(len(keys)))
+			cursor = next
+			if cursor == 0 {
+				break
+			}
+		}
+		return nil
+	}
+
+	if cc, ok := rdb.(*redis.ClusterClient); ok {
+		if err := cc.ForEachMaster(ctx, func(ctx context.Context, c *redis.Client) error {
+			return countNode(ctx, c)
+		}); err != nil {
+			return 0, err
+		}
+	} else {
+		if err := countNode(ctx, rdb); err != nil {
+			return 0, err
+		}
+	}
+
+	return total.Load(), nil
+}
+
+func normalizeMatch(match string) string {
+	if match == "" {
+		return "*"
+	}
+	return match
 }

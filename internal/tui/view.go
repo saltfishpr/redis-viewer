@@ -23,25 +23,34 @@ var (
 	statusBarStyle = lipgloss.NewStyle().
 			Foreground(lipgloss.AdaptiveColor{Light: "#343433", Dark: "#C1C6B2"}).
 			Background(lipgloss.AdaptiveColor{Light: "#D9DCCF", Dark: "#353533"})
-	statusStyle = statusBarStyle.Copy().
+	statusStyle = statusBarStyle.
 			Foreground(lipgloss.Color("#FFFDF5")).
 			Background(lipgloss.Color("#FF5F87")).
 			Padding(0, 1).
 			MarginRight(1)
-	encodingStyle = statusNugget.Copy().Background(lipgloss.Color("#A550DF")).Align(lipgloss.Right)
-	statusText    = statusBarStyle.Copy()
-	datetimeStyle = statusNugget.Copy().Background(lipgloss.Color("#6124DF"))
+	pageStyle     = statusNugget.Background(lipgloss.Color("#2D8CFF"))
+	encodingStyle = statusNugget.Background(lipgloss.Color("#A550DF")).Align(lipgloss.Right)
+	statusText    = statusBarStyle
+	datetimeStyle = statusNugget.Background(lipgloss.Color("#6124DF"))
 )
 
 func (m model) listView() string {
-	return listViewStyle.Render(m.list.View())
+	listModel := m.list
+	total := len(listModel.Items())
+	current := 0
+	if listModel.SelectedItem() != nil {
+		current = listModel.GlobalIndex() + 1
+	}
+	listModel.Title = fmt.Sprintf("Redis Viewer (%d/%d)", current, total)
+
+	return listViewStyle.Render(listModel.View())
 }
 
 func (m model) viewportContent(width int) string {
 	var builder strings.Builder
 	divider := dividerStyle.Render(strings.Repeat("-", width)) + "\n"
 	if it := m.list.SelectedItem(); it != nil {
-		keyType := fmt.Sprintf("KeyType: %s\n", it.(item).keyType)
+		keyType := fmt.Sprintf("Type: %s\n", it.(item).keyType)
 		key := fmt.Sprintf("Key: \n%s\n", it.(item).key)
 		value := fmt.Sprintf("Value: \n%s\n", it.(item).val)
 		builder.WriteString(keyType)
@@ -70,21 +79,22 @@ func (m model) statusView() string {
 	default:
 		status = "Ready"
 		statusDesc = m.statusMessage
-		if !m.ready {
+		if !m.countReady {
 			status = m.spinner.View()
 			statusDesc = "Loading..."
 		}
 	}
 
 	statusKey := statusStyle.Render(status)
+	page := pageStyle.Render(fmt.Sprintf("Page %d Size %d", m.pageNum+1, m.pageSize))
 	encoding := encodingStyle.Render("UTF-8")
 	datetime := datetimeStyle.Render(m.now)
 
-	statusVal := statusText.Copy().
-		Width(m.width - lipgloss.Width(statusKey) - lipgloss.Width(encoding) - lipgloss.Width(datetime)).
+	statusVal := statusText.
+		Width(m.width - lipgloss.Width(statusKey) - lipgloss.Width(page) - lipgloss.Width(encoding) - lipgloss.Width(datetime)).
 		Render(statusDesc)
 
-	bar := lipgloss.JoinHorizontal(lipgloss.Top, statusKey, statusVal, encoding, datetime)
+	bar := lipgloss.JoinHorizontal(lipgloss.Top, statusKey, statusVal, page, encoding, datetime)
 
 	return statusBarStyle.Width(m.width).Render(bar)
 }

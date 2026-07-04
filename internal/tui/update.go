@@ -51,7 +51,7 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		} else {
 			m.statusMessage = fmt.Sprintf("%d keys found", msg.count)
 		}
-		m.ready = true
+		m.countReady = true
 	}
 
 	switch m.state {
@@ -86,13 +86,22 @@ func (m *model) handleDefaultState(msg tea.Msg) tea.Cmd {
 				m.textinput.Focus()
 				return textinput.Blink
 			case key.Matches(msg, m.keyMap.reload):
-				m.ready = false
+				m.pageNum = 0
+				m.countReady = false
 				cmds = append(cmds, m.scanCmd(), m.countCmd())
 			}
 		case tea.KeyCtrlC:
 			cmd = tea.Quit
 			cmds = append(cmds, cmd)
-		case tea.KeyUp, tea.KeyDown, tea.KeyLeft, tea.KeyRight:
+		case tea.KeyLeft:
+			if m.pageNum > 0 {
+				m.pageNum--
+				cmds = append(cmds, m.scanCmd())
+			}
+		case tea.KeyRight:
+			m.pageNum++
+			cmds = append(cmds, m.scanCmd())
+		case tea.KeyUp, tea.KeyDown:
 			m.list, cmd = m.list.Update(msg)
 			cmds = append(cmds, cmd)
 			m.viewport.GotoTop()
@@ -124,12 +133,13 @@ func (m *model) handleSearchState(msg tea.Msg) tea.Cmd {
 			m.state = defaultState
 		case tea.KeyEnter:
 			m.searchValue = m.textinput.Value()
+			m.pageNum = 0
 
 			m.textinput.Blur()
 			m.textinput.Reset()
 			m.state = defaultState
 
-			m.ready = false
+			m.countReady = false
 			cmds = append(cmds, m.scanCmd(), m.countCmd())
 		}
 	}

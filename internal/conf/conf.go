@@ -17,7 +17,7 @@ type Config struct {
 	// sentinel
 	MasterName string `mapstructure:"master_name"`
 
-	Limit int64 `mapstructure:"limit"` // default 20
+	PageSize int64 `mapstructure:"page_size"` // default 20
 }
 
 // Get returns the users config.
@@ -25,6 +25,5 @@ func Get() (config Config) {
 	if err := viper.Unmarshal(&config); err != nil {
 		log.Fatal("Error parsing config", err)
 	}
-
 	return
 }

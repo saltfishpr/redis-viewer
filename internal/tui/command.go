@@ -14,7 +14,6 @@ import (
 
 	"github.com/charmbracelet/bubbles/list"
 	tea "github.com/charmbracelet/bubbletea"
-	"github.com/spf13/cast"
 )
 
 type errMsg struct {
@@ -34,7 +33,7 @@ func (m model) scanCmd() tea.Cmd {
 			items []list.Item
 		)
 
-		keyMessages := rv.GetKeys(m.rdb, cast.ToUint64(m.offset*m.limit), m.searchValue, m.limit)
+		keyMessages := rv.ScanKeys(m.rdb, m.searchValue, m.pageNum*m.pageSize, m.pageSize)
 		for keyMessage := range keyMessages {
 			if keyMessage.Err != nil {
 				return errMsg{err: keyMessage.Err}
@@ -56,10 +55,12 @@ func (m model) scanCmd() tea.Cmd {
 				err = fmt.Errorf("unsupported type: %s", kt)
 			}
 			if err != nil {
-				items = append(
-					items,
-					item{keyType: kt, key: keyMessage.Key, val: err.Error(), err: true},
-				)
+				items = append(items, item{
+					keyType: kt,
+					key:     keyMessage.Key,
+					val:     err.Error(),
+					err:     true,
+				})
 			} else {
 				valBts, _ := util.JsonMarshalIndent(val)
 				items = append(items, item{keyType: kt, key: keyMessage.Key, val: string(valBts)})
@@ -71,7 +72,7 @@ func (m model) scanCmd() tea.Cmd {
 }
 
 type countMsg struct {
-	count int
+	count int64
 }
 
 func (m model) countCmd() tea.Cmd {

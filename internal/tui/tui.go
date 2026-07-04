@@ -37,11 +37,11 @@ type model struct {
 	rdb           redis.UniversalClient
 	searchValue   string
 	statusMessage string
-	ready         bool
+	countReady    bool
 	now           string
 
-	offset int64
-	limit  int64 // scan size
+	pageNum  int64
+	pageSize int64 // scan size
 
 	keyMap
 	state
@@ -84,7 +84,7 @@ func New(config conf.Config) (*model, error) {
 
 		rdb: rdb,
 
-		limit: config.Limit,
+		pageSize: config.PageSize,
 
 		keyMap: defaultKeyMap(),
 		state:  defaultState,
